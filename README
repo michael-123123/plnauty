@@ -1,0 +1,36 @@
+
+Installation Instructions:
+---------------------------
+
+to compile the sources (will compile both nauty and plnauty):
+
+$ make all
+$ make install
+
+this will create a build/ folder that contains everything.
+you can copy it wherever, or put it in your file_search_path
+(see more details in Usage section)
+
+Supported Platforms:
+--------------------
+
+This package has been tested and run on 64 bit linux (debian and ubuntu)
+with swi-prolog version 7.x.x. The package should be able to run on
+earlier swi-prolog versions, though this is considered experimental.
+
+If you have success compiling this package on windows (with mingw, msvc 
+or any other way) we would very much like to know about it.
+
+Usage:
+------
+
+After installation, the build folder will be created and contain densenauty.pl,
+pl-gtools, and pl-nauty.so. In order to use the pl-nauty package call 
+use_module(densenauty) and you're good to go.
+
+If you move densenauty.pl to another directory you need to either move pl-nauty.so
+with it or modify densenauty.pl's code to include pl-nauty.so from another location. 
+
+We suggest you have a file_search_path for nauty set to pl-nauty's build
+directory, and then you can simply call use_module(nauty(densenauty)) etc..
+an example of how it might be done is included in examples/cfg/dotswiplrc.example 

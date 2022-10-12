@@ -1,0 +1,39 @@
+/*  -*- Prolog -*-
+
+    SWI-Prolog personalization file
+*/
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This is a sample user-initialisation file for the pl-nauty package. If you 
+wish to customise pl-nauty, append this file to your local swiplrc and edit 
+it to your preferences.
+
+Installation:
+
+	Unix/MacOS:	~/.swiplrc
+	Windows:	<appdata>/swipl.ini (see win_folder(appdata, AppData))
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/********************************
+ *	    pl-nauty		*
+ *******************************/
+
+% the easy thing to do is to setup some paths 
+% that can be used to quickly load pl-nauty later
+% these are the common ones:
+
+% the simplest way to accomplish this is with an
+% environment variable called 'PL_NAUTY_HOME'
+% that points to nauty's location (it is assumed that
+% nauty is built there).
+user:file_search_path(nauty, Nauty) :-
+	getenv('PL_NAUTY_HOME', Nauty).
+user:file_search_path(nauty, Build) :-
+	getenv('PL_NAUTY_HOME', Nauty),
+	atom_concat(Nauty,'/build', Build).
+
+
+% another way to set this up is by specifying the location itself.
+user:file_search_path(nauty, library).
+user:file_search_path(nauty, '/home/michael/pl-nauty').
+user:file_search_path(nauty, '/home/michael/pl-nauty/build').

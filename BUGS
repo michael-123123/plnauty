@@ -1,0 +1,6 @@
+1.
+when the first call to $densenauty has n=0 there is a c-error followed by program crash because of how DYNALLOC works
+this needs to be fixed by initialization
+
+2.
+most externs can be made static and dropped from header files

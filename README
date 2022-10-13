@@ -34,3 +34,26 @@ with it or modify densenauty.pl's code to include pl-nauty.so from another locat
 We suggest you have a file_search_path for nauty set to pl-nauty's build
 directory, and then you can simply call use_module(nauty(densenauty)) etc..
 an example of how it might be done is included in examples/cfg/dotswiplrc.example 
+
+Citation:
+---------
+
+If you use this library, please cite out paper on the subject.
+
+@article{DBLP:journals/tplp/FrankC16,
+  author    = {Michael Frank and
+               Michael Codish},
+  title     = {Logic Programming with Graph Automorphism: Integrating nauty with
+               Prolog (Tool Description)},
+  journal   = {Theory Pract. Log. Program.},
+  volume    = {16},
+  number    = {5-6},
+  pages     = {688--702},
+  year      = {2016},
+  url       = {https://doi.org/10.1017/S1471068416000223},
+  doi       = {10.1017/S1471068416000223},
+  timestamp = {Thu, 13 Feb 2020 14:39:37 +0100},
+  biburl    = {https://dblp.org/rec/journals/tplp/FrankC16.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+

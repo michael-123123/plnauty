@@ -1,0 +1,6 @@
+*.o
+*.so
+*.a
+pl.conf
+build/
+nauty[0-9]*/

@@ -25,17 +25,21 @@ pl_unify_graph_ex(term_t Graph, int n, int m, flag_t fmt, graph* g)
 	term_t Fmt ;
 	
 	switch (fmt) {
-		case PL_GRAPH_FMT_MATRIX   : return pl_unify_graph_adj_mat_ex(Graph, n, m, g   ) ;
-		case PL_GRAPH_FMT_ADJ_LIST : return pl_unify_graph_adj_lists_ex(Graph, n, m, g ) ;
-		case PL_GRAPH_FMT_EDGE_LIST: return pl_unify_graph_edge_lists_ex(Graph, n, m, g) ;
-		case PL_GRAPH_FMT_UPPER    : return pl_unify_graph_upper_ex(Graph, n, m, g     ) ;
-		case PL_GRAPH_FMT_FLAT     : return pl_unify_graph_flat_ex(Graph, n, m, g      ) ;
-		case PL_GRAPH_FMT_CHAR2    : return pl_unify_graph_char2_ex(Graph, n, m, g     ) ;
-		case PL_GRAPH_FMT_CHAR16   : return pl_unify_graph_char16_ex(Graph, n, m, g    ) ;
-		case PL_GRAPH_FMT_G6_CODES : return pl_unify_graph_g6codes_ex(Graph, n, m, g   ) ;
-		case PL_GRAPH_FMT_G6_CHARS : return pl_unify_graph_g6chars_ex(Graph, n, m, g   ) ;
-		case PL_GRAPH_FMT_G6_ATOM  : return pl_unify_graph_g6atom_ex(Graph, n, m, g    ) ;
-		case PL_GRAPH_FMT_G6_STRING: return pl_unify_graph_g6string_ex(Graph, n, m, g  ) ;
+		case PL_GRAPH_FMT_MATRIX           : return pl_unify_graph_adj_mat_ex      (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_ADJ_LIST         : return pl_unify_graph_adj_lists_ex    (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_EDGE_LIST        : return pl_unify_graph_edge_lists_ex   (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_UPPER            : return pl_unify_graph_upper_ex        (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_FLAT             : return pl_unify_graph_flat_ex         (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_CHAR2            : return pl_unify_graph_char2_ex        (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_CHAR16           : return pl_unify_graph_char16_ex       (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_G6_CODES         : return pl_unify_graph_g6codes_ex      (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_G6_CHARS         : return pl_unify_graph_g6chars_ex      (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_G6_ATOM          : return pl_unify_graph_g6atom_ex       (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_G6_STRING        : return pl_unify_graph_g6string_ex     (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_D6_ATOM          : return pl_unify_graph_d6atom_ex       (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_DI_EDGE_LIST     : return pl_unify_graph_di_edge_list_ex (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_PERMUTATION_LIST : return pl_unify_graph_perm_list_ex    (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_PERMUTATION_PAIRS: return pl_unify_graph_perm_pairs_ex   (Graph, n, m, g) ;
 		
 		default:
 			Fmt = PL_new_term_ref() ;
@@ -311,7 +315,7 @@ pl_unify_graph_flat_ex(term_t Graph, int n, int m, graph *g)
 	for(i = 0 ; i < n ; i++) {
 		gi = GRAPHROW(g, i, m) ;
 		
-		for(j = 0 ; j < n ; j++) {
+		for(j = i+1 ; j < n ; j++) {
 			cell = PL_new_term_ref() ;
 			if(!PL_unify_list(mat, cell, mat)) {
 				PL_UNIFIABLE_ERROR("pair", mat) ;
@@ -562,3 +566,218 @@ pl_unify_graph_g6string_ex(term_t Graph, int n, int m, graph *g)
 	
 	return TRUE ;
 }
+
+/*
+ * **********************************************
+ * graph* -> PL_GRAPH_FMT_D6_ATOM
+ * **********************************************
+ */
+int
+pl_unify_graph_d6atom_ex(term_t Graph, int n, int m, graph *g)
+{
+	term_t Fmt ;
+	char *p, *gstr ;
+	p = gstr = ntod6(g, m, n) ;
+	if(gstr == NULL) 
+		return FALSE ;
+	
+	while(*p++ != '\n') { }
+	*--p = '\0' ;
+	
+	term_t result = PL_new_term_ref() ;
+	if(!PL_put_atom_chars(result, gstr)) {
+		PL_PUT_ERROR("atom", result) ;
+		return FALSE ;
+	}
+	
+	if(!PL_unify(result, Graph)) {
+		PL_UNIFIABLE_ERROR("result_atom", Graph) ;
+		return FALSE ;
+	}
+	
+	return TRUE ;
+}
+
+/*
+ * **********************************************
+ * graph* -> PL_GRAPH_FMT_DI_EDGE_LIST
+ * **********************************************
+ */
+int
+pl_unify_graph_di_edge_list_ex(term_t Graph, int n, int m, graph *g)
+{
+	functor_t minus_f = PL_new_functor(PL_new_atom("-"), 2) ;
+	
+	int i, j, c ;
+	term_t head, tail, u, v ;
+	set *gi ;
+	
+	head = PL_new_term_ref() ;
+	tail = PL_new_term_ref() ;
+	if(!PL_put_nil(tail)) {
+		PL_PUT_ERROR("[]", tail) ;
+		return FALSE ;
+	}
+	
+	v = PL_new_term_ref() ;
+	u = PL_new_term_ref() ;
+	
+	for(i = n-1 ; i >= 0 ; i--) {
+		gi = GRAPHROW(g, i, m) ;
+		
+		if(!PL_put_integer(v, i+1)) {
+			PL_PUT_ERROR("integer", v) ;
+			return FALSE ;
+		}
+		
+		for(j = n-1 ; j >= 0 ; j--) {
+			if(ISELEMENT(gi, j)) {
+				u = PL_new_term_ref() ;
+				if(!PL_put_integer(u, j+1)) {
+					PL_PUT_ERROR("integer", u) ;
+					return FALSE ;
+				}
+				
+				head = PL_new_term_ref() ;
+				if(!PL_cons_functor(head, minus_f, v, u)) {
+					PL_PUT_ERROR("v-u", head) ;
+					return FALSE ;
+				}
+				
+				if(!PL_cons_list(tail, head, tail)) {
+					PL_PUT_ERROR("cons", tail) ;
+					return FALSE ;
+				}
+			}
+		}
+	}
+	
+	if(!PL_unify(Graph, tail)) {
+		PL_UNIFIABLE_ERROR("edge_list", Graph) ;
+		return FALSE ;
+	}
+	
+	return TRUE ;
+}
+
+/*
+ * **********************************************
+ * graph* -> PL_GRAPH_FMT_PERMUTATION_LIST
+ * **********************************************
+ */
+int
+pl_unify_graph_perm_list_ex(term_t Graph, int n, int m, graph *g)
+{
+	functor_t minus_f = PL_new_functor(PL_new_atom("-"), 2) ;
+	
+	int i, j, c, k ;
+	term_t head, tail, u, v ;
+	set *gi ;
+	
+	head = PL_new_term_ref() ;
+	tail = PL_new_term_ref() ;
+	if(!PL_put_nil(tail)) {
+		PL_PUT_ERROR("[]", tail) ;
+		return FALSE ;
+	}
+	
+	v = PL_new_term_ref() ;
+	u = PL_new_term_ref() ;
+	
+	for(i = n-1 ; i >= 0 ; i--) {
+		gi = GRAPHROW(g, i, m) ;
+		
+		if(!PL_put_integer(v, i+1)) {
+			PL_PUT_ERROR("integer", v) ;
+			return FALSE ;
+		}
+		
+		k=-1 ;
+		for(j = n-1 ; j >= 0 && k == i ; j--) {
+			if(ISELEMENT(gi, j)) {
+				k = j ;
+			}
+		}
+		
+		head = PL_new_term_ref () ;
+		if (!PL_put_integer (head, k+1)) {
+			PL_PUT_ERROR("integer", head) ;
+			return FALSE ;
+		}
+		
+		if (!PL_cons_list (tail, head, tail)) {
+			PL_PUT_ERROR("cons", tail) ;
+			return FALSE ;
+		}
+	}
+	
+	if(!PL_unify(Graph, tail)) {
+		PL_UNIFIABLE_ERROR("edge_list", Graph) ;
+		return FALSE ;
+	}
+	
+	return TRUE ;
+}
+
+/*
+ * **********************************************
+ * graph* -> PL_GRAPH_FMT_PERMUTATION_PAIRS
+ * **********************************************
+ */
+int
+pl_unify_graph_perm_pairs_ex(term_t Graph, int n, int m, graph *g)
+{
+	functor_t minus_f = PL_new_functor(PL_new_atom("-"), 2) ;
+	
+	int i, j, c ;
+	term_t head, tail, u, v ;
+	set *gi ;
+	
+	head = PL_new_term_ref() ;
+	tail = PL_new_term_ref() ;
+	if(!PL_put_nil(tail)) {
+		PL_PUT_ERROR("[]", tail) ;
+		return FALSE ;
+	}
+	
+	v = PL_new_term_ref() ;
+	u = PL_new_term_ref() ;
+	
+	for(i = n-1 ; i >= 0 ; i--) {
+		gi = GRAPHROW(g, i, m) ;
+		
+		if(!PL_put_integer(v, i+1)) {
+			PL_PUT_ERROR("integer", v) ;
+			return FALSE ;
+		}
+		
+		for(j = n-1 ; j >= 0 ; j--) {
+			if(ISELEMENT(gi, j)) {
+				u = PL_new_term_ref() ;
+				if(!PL_put_integer(u, j+1)) {
+					PL_PUT_ERROR("integer", u) ;
+					return FALSE ;
+				}
+				
+				head = PL_new_term_ref() ;
+				if(!PL_cons_functor(head, minus_f, v, u)) {
+					PL_PUT_ERROR("v-u", head) ;
+					return FALSE ;
+				}
+				
+				if(!PL_cons_list(tail, head, tail)) {
+					PL_PUT_ERROR("cons", tail) ;
+					return FALSE ;
+				}
+			}
+		}
+	}
+	
+	if(!PL_unify(Graph, tail)) {
+		PL_UNIFIABLE_ERROR("edge_list", Graph) ;
+		return FALSE ;
+	}
+	
+	return TRUE ;
+}
+

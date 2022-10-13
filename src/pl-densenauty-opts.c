@@ -52,6 +52,10 @@ atom_t g6_atom_a      = (atom_t) NULL ;
 atom_t g6_chars_a     = (atom_t) NULL ;
 atom_t g6_codes_a     = (atom_t) NULL ;
 atom_t g6_string_a    = (atom_t) NULL ;
+atom_t d6_atom_a      = (atom_t) NULL ;
+atom_t di_edge_list_a = (atom_t) NULL ;
+atom_t perm_list_a    = (atom_t) NULL ;
+atom_t perm_pairs_a   = (atom_t) NULL ;
 
 /*
  * **********************************************
@@ -94,17 +98,22 @@ pl_densenauty_init()
 	/*
 	 * initialize format names
 	 */
-	adj_mat_a      = PL_new_atom("adj_matrix")            ;
-	adj_lists_a    = PL_new_atom("adj_lists")             ;
-	edge_list_a    = PL_new_atom("edge_list")             ;
-	upper_tri_a    = PL_new_atom("upper_triangle")        ;
-	upper_flat_a   = PL_new_atom("upper_triangle_flat")   ;
-	upper_char2_a  = PL_new_atom("upper_triangle_char2")  ;
-	upper_char16_a = PL_new_atom("upper_triangle_char16") ;
-	g6_atom_a      = PL_new_atom("graph6_atom")           ;
-	g6_chars_a     = PL_new_atom("graph6_chars")          ;
-	g6_codes_a     = PL_new_atom("graph6_codes")          ;
-	g6_string_a    = PL_new_atom("graph6_string")         ;
+	adj_mat_a      = PL_new_atom("adj_matrix")             ;
+	adj_lists_a    = PL_new_atom("adj_lists")              ;
+	edge_list_a    = PL_new_atom("edge_list")              ;
+	upper_tri_a    = PL_new_atom("upper_triangle")         ;
+	upper_flat_a   = PL_new_atom("upper_triangle_flat")    ;
+	upper_char2_a  = PL_new_atom("upper_triangle_char2")   ;
+	upper_char16_a = PL_new_atom("upper_triangle_char16")  ;
+	g6_atom_a      = PL_new_atom("graph6_atom")            ;
+	g6_chars_a     = PL_new_atom("graph6_chars")           ;
+	g6_codes_a     = PL_new_atom("graph6_codes")           ;
+	g6_string_a    = PL_new_atom("graph6_string")          ;
+	d6_atom_a      = PL_new_atom("digraph6_atom")          ;
+	di_edge_list_a = PL_new_atom("directed_edge_list")     ;
+	perm_list_a    = PL_new_atom("permutation_list")       ;
+	perm_pairs_a   = PL_new_atom("permutation_pairs_list") ;
+
 
 	/*
 	 * initialize option struct
@@ -280,7 +289,7 @@ pl_get_isomorphic_opts_ex(term_t Opts, pl_isomorphic_optsblk* opts)
 			continue ;
 		
 		if(opt != fmt1_a   && opt != fmt2_a && opt != get_perm_a &&
-		   opt != get_cg_a && opt != cgfmt_a )
+		   opt != get_cg_a && opt != cgfmt_a && opt != digraph_a)
 			continue ;
 		
 		/*
@@ -325,6 +334,9 @@ pl_get_isomorphic_opts_ex(term_t Opts, pl_isomorphic_optsblk* opts)
 			
 			if(!pl_get_densenauty_fmt_ex(arg1, &opts->cgfmt))
 				return FALSE ;
+		} else if(opt == digraph_a) {
+			if (!PL_get_bool_ex(arg1, &opts->digraph))
+				return FALSE ;
 		}
 	}
 	
@@ -344,17 +356,21 @@ pl_get_densenauty_fmt_ex(term_t Fmt, flag_t* fmt)
 	if(!PL_get_atom_ex(Fmt, &name))
 		return FALSE ;
 	
-	     if( name == adj_mat_a      ) *fmt = PL_GRAPH_FMT_MATRIX    ;
-	else if( name == adj_lists_a    ) *fmt = PL_GRAPH_FMT_ADJ_LIST  ;
-	else if( name == edge_list_a    ) *fmt = PL_GRAPH_FMT_EDGE_LIST ;
-	else if( name == upper_tri_a    ) *fmt = PL_GRAPH_FMT_UPPER     ;
-	else if( name == upper_flat_a   ) *fmt = PL_GRAPH_FMT_FLAT      ;
-	else if( name == upper_char2_a  ) *fmt = PL_GRAPH_FMT_CHAR2     ;
-	else if( name == upper_char16_a ) *fmt = PL_GRAPH_FMT_CHAR16    ;
-	else if( name == g6_atom_a      ) *fmt = PL_GRAPH_FMT_G6_ATOM   ;
-	else if( name == g6_chars_a     ) *fmt = PL_GRAPH_FMT_G6_CHARS  ;
-	else if( name == g6_codes_a     ) *fmt = PL_GRAPH_FMT_G6_CODES  ;
-	else if( name == g6_string_a    ) *fmt = PL_GRAPH_FMT_G6_STRING ;
+	     if( name == adj_mat_a      ) *fmt = PL_GRAPH_FMT_MATRIX            ;
+	else if( name == adj_lists_a    ) *fmt = PL_GRAPH_FMT_ADJ_LIST          ;
+	else if( name == edge_list_a    ) *fmt = PL_GRAPH_FMT_EDGE_LIST         ;
+	else if( name == upper_tri_a    ) *fmt = PL_GRAPH_FMT_UPPER             ;
+	else if( name == upper_flat_a   ) *fmt = PL_GRAPH_FMT_FLAT              ;
+	else if( name == upper_char2_a  ) *fmt = PL_GRAPH_FMT_CHAR2             ;
+	else if( name == upper_char16_a ) *fmt = PL_GRAPH_FMT_CHAR16            ;
+	else if( name == g6_atom_a      ) *fmt = PL_GRAPH_FMT_G6_ATOM           ;
+	else if( name == g6_chars_a     ) *fmt = PL_GRAPH_FMT_G6_CHARS          ;
+	else if( name == g6_codes_a     ) *fmt = PL_GRAPH_FMT_G6_CODES          ;
+	else if( name == g6_string_a    ) *fmt = PL_GRAPH_FMT_G6_STRING         ;
+	else if( name == d6_atom_a      ) *fmt = PL_GRAPH_FMT_D6_ATOM           ;
+	else if( name == di_edge_list_a ) *fmt = PL_GRAPH_FMT_DI_EDGE_LIST      ;
+	else if( name == perm_list_a    ) *fmt = PL_GRAPH_FMT_PERMUTATION_LIST  ;
+	else if( name == perm_pairs_a   ) *fmt = PL_GRAPH_FMT_PERMUTATION_PAIRS ;
 	else { PL_type_error("legal graph format", Fmt); return FALSE ; }
 	
 	return TRUE ;

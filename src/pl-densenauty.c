@@ -169,7 +169,16 @@ pl_isomorphic(term_t N, term_t Graph1, term_t Graph2, term_t Perm, term_t Canoni
 	DYNALLSTAT(int,ptn,ptn_sz);
 	DYNALLSTAT(int,orbits,orbits_sz);
 	DYNALLSTAT(int,perm,perm_sz);
-	DEFAULTOPTIONS_GRAPH(options);
+	optionblk options ;
+	
+	if(pl_isomorphic_opts.digraph) {
+		DEFAULTOPTIONS_DIGRAPH(options1) ;
+		options = options1 ;
+	} else {
+		DEFAULTOPTIONS_GRAPH(options2);
+		options = options2 ;
+	}
+
 	statsblk stats;
 	
 	int m, n, i ;

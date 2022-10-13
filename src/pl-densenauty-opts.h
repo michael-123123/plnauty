@@ -69,6 +69,7 @@
  * - graph6_chars
  * - graph6_codes
  * - graph6_string
+ * - digraph6_atom
  * **********************************************
  */
 
@@ -131,6 +132,7 @@ typedef struct {
 	flag_t cgfmt    ;
 	bool_t get_cg   ;
 	bool_t get_perm ;
+	bool_t digraph  ;
 } pl_isomorphic_optsblk ;
 
 #define PL_ISOMORPHIC_DEFAULTOPTS(opts) \
@@ -140,6 +142,7 @@ typedef struct {
 	opts.cgfmt    = 1 ;		\
 	opts.get_cg   = 1 ;		\
 	opts.get_perm = 1 ;		\
+	opts.digraph  = 0 ;             \
 	} while(0) ;
 
 
@@ -150,6 +153,7 @@ typedef struct {
 	opts->cgfmt    = 1 ;			\
 	opts->get_cg   = 1 ;			\
 	opts->get_perm = 1 ;			\
+	opts->digraph  = 0 ;                 	\
 	} while(0) ;
 
 /*
@@ -191,6 +195,10 @@ extern atom_t g6_atom_a      ;
 extern atom_t g6_chars_a     ;
 extern atom_t g6_codes_a     ;
 extern atom_t g6_string_a    ;
+extern atom_t d6_atom_a      ;
+extern atom_t di_edge_list_a ;
+extern atom_t perm_list_a    ;
+extern atom_t perm_pairs_a   ;
 
 /*
  * static options struct

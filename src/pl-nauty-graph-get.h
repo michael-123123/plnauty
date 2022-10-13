@@ -24,7 +24,10 @@ int pl_get_graph_g6codes_ex(term_t, int, int, graph*) ;
 int pl_get_graph_g6chars_ex(term_t, int, int, graph*) ;
 int pl_get_graph_g6atom_ex(term_t, int, int, graph*) ;
 int pl_get_graph_g6string_ex(term_t, int, int, graph*) ;
-
+int pl_get_graph_d6atom_ex(term_t, int, int, graph*) ;
+int pl_get_graph_di_edge_list_ex(term_t, int, int, graph*) ;
+int pl_get_graph_perm_list_ex(term_t, int, int, graph*) ;
+int pl_get_graph_perm_pairs_ex(term_t, int, int, graph*) ;
 
 //
 #endif

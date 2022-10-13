@@ -25,17 +25,21 @@ pl_get_graph_ex(term_t Graph, int n, int m, flag_t fmt, graph* g)
 	term_t Fmt ;
 	
 	switch (fmt) {
-		case PL_GRAPH_FMT_MATRIX   : return pl_get_graph_adj_mat_ex    (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_ADJ_LIST : return pl_get_graph_adj_lists_ex  (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_EDGE_LIST: return pl_get_graph_edge_lists_ex (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_UPPER    : return pl_get_graph_upper_ex      (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_FLAT     : return pl_get_graph_flat_ex       (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_CHAR2    : return pl_get_graph_char2_ex      (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_CHAR16   : return pl_get_graph_char16_ex     (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_G6_CODES : return pl_get_graph_g6codes_ex    (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_G6_CHARS : return pl_get_graph_g6chars_ex    (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_G6_ATOM  : return pl_get_graph_g6atom_ex     (Graph, n, m, g) ;
-		case PL_GRAPH_FMT_G6_STRING: return pl_get_graph_g6string_ex   (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_MATRIX           : return pl_get_graph_adj_mat_ex      (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_ADJ_LIST         : return pl_get_graph_adj_lists_ex    (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_EDGE_LIST        : return pl_get_graph_edge_lists_ex   (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_UPPER            : return pl_get_graph_upper_ex        (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_FLAT             : return pl_get_graph_flat_ex         (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_CHAR2            : return pl_get_graph_char2_ex        (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_CHAR16           : return pl_get_graph_char16_ex       (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_G6_CODES         : return pl_get_graph_g6codes_ex      (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_G6_CHARS         : return pl_get_graph_g6chars_ex      (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_G6_ATOM          : return pl_get_graph_g6atom_ex       (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_G6_STRING        : return pl_get_graph_g6string_ex     (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_D6_ATOM          : return pl_get_graph_d6atom_ex       (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_DI_EDGE_LIST     : return pl_get_graph_di_edge_list_ex (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_PERMUTATION_LIST : return pl_get_graph_perm_list_ex    (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_PERMUTATION_PAIRS: return pl_get_graph_perm_pairs_ex   (Graph, n, m, g) ;
 		
 		default:
 			Fmt = PL_new_term_ref() ;
@@ -466,5 +470,185 @@ pl_get_graph_g6string_ex(term_t Graph, int n, int m, graph *g)
 	}
 	
 	stringtograph(gstr, g, m) ;
+	return TRUE ;
+}
+
+/*
+ * **********************************************
+ * PL_GRAPH_FMT_D6_ATOM -> graph*
+ * **********************************************
+ */
+int
+pl_get_graph_d6atom_ex(term_t Graph, int n, int m, graph *g)
+{
+	char * gstr ;
+	if(!PL_get_chars(Graph, &gstr, CVT_ATOMIC)) {
+		PL_UNIFIABLE_ERROR("atomic", Graph) ;
+		return FALSE ;
+	}
+	
+	stringtograph(gstr, g, m) ;
+	return TRUE ;
+}
+
+/*
+ * **********************************************
+ * PL_GRAPH_FMT_DI_EDGE_LIST -> graph*
+ * **********************************************
+ */
+int
+pl_get_graph_di_edge_list_ex(term_t Graph, int n, int m, graph *g)
+{
+	int u,v ;
+	term_t head, tail, U, V;
+	functor_t minus_f ; 
+	
+	minus_f = PL_new_functor(PL_new_atom("-"), 2) ;
+	
+	EMPTYGRAPH(g,m,n) ;
+	
+	U = PL_new_term_ref() ;
+	V = PL_new_term_ref() ;
+	
+	head = PL_new_term_ref() ;
+	tail = PL_copy_term_ref(Graph) ;
+	
+	while(PL_get_list_ex(tail, head, tail)) {
+		
+		
+		if(!PL_is_functor(head, minus_f)) {
+			PL_type_error("-/2", head) ;
+			return FALSE ;
+		}
+		
+		if(!PL_get_arg(1, head, U)) {
+			PL_type_error("U-v", head) ;
+		}
+		
+		if(!PL_get_arg(2, head, V)) {
+			PL_type_error("u-V", head) ;
+		}
+		
+		if(!PL_get_integer_ex(U, &u))
+			return FALSE ;
+		
+		if(!PL_get_integer_ex(V, &v))
+			return FALSE ;
+		
+		if(v < 1 || v > n) {
+			PL_type_error("v:between(1,|V|)", V) ;
+			return FALSE ;
+		}
+		
+		if(u < 1 || u > n) {
+			PL_type_error("u:between(1,|V|)", U) ;
+			return FALSE ;
+		}
+		
+		ADDONEARC(g, u-1, v-1, m) ;
+	}
+	
+	if(!PL_get_nil_ex(tail))
+		return FALSE ;
+	
+	return TRUE ;
+}
+
+/*
+ * **********************************************
+ * PL_GRAPH_FMT_PERMUTATION_LIST -> graph*
+ * **********************************************
+ */
+int
+pl_get_graph_perm_list_ex(term_t Graph, int n, int m, graph *g)
+{
+	int u=1,v ;
+	term_t head, tail ;
+		
+	EMPTYGRAPH(g,m,n) ;
+	
+	head = PL_new_term_ref() ;
+	tail = PL_copy_term_ref(Graph) ;
+	
+	while(PL_get_list_ex(tail, head, tail)) {
+		
+		if(!PL_get_integer_ex(head, &v))
+			return FALSE ;
+		
+		if(v < 1 || v > n) {
+			PL_type_error("v:between(1,|V|)", head) ;
+			return FALSE ;
+		}
+		
+		ADDONEARC(g, u-1, v-1, m) ;
+		++ u ;
+	}
+	
+	if(!PL_get_nil_ex(tail))
+		return FALSE ;
+	
+	return TRUE ;
+}
+
+/*
+ * **********************************************
+ * PL_GRAPH_FMT_PERMUTATION_PAIRS -> graph*
+ * **********************************************
+ */
+int
+pl_get_graph_perm_pairs_ex(term_t Graph, int n, int m, graph *g)
+{
+	int u,v ;
+	term_t head, tail, U, V;
+	functor_t minus_f ; 
+	
+	minus_f = PL_new_functor(PL_new_atom("-"), 2) ;
+	
+	EMPTYGRAPH(g,m,n) ;
+	
+	U = PL_new_term_ref() ;
+	V = PL_new_term_ref() ;
+	
+	head = PL_new_term_ref() ;
+	tail = PL_copy_term_ref(Graph) ;
+	
+	while(PL_get_list_ex(tail, head, tail)) {
+		
+		
+		if(!PL_is_functor(head, minus_f)) {
+			PL_type_error("-/2", head) ;
+			return FALSE ;
+		}
+		
+		if(!PL_get_arg(1, head, U)) {
+			PL_type_error("U-v", head) ;
+		}
+		
+		if(!PL_get_arg(2, head, V)) {
+			PL_type_error("u-V", head) ;
+		}
+		
+		if(!PL_get_integer_ex(U, &u))
+			return FALSE ;
+		
+		if(!PL_get_integer_ex(V, &v))
+			return FALSE ;
+		
+		if(v < 1 || v > n) {
+			PL_type_error("v:between(1,|V|)", V) ;
+			return FALSE ;
+		}
+		
+		if(u < 1 || u > n) {
+			PL_type_error("u:between(1,|V|)", U) ;
+			return FALSE ;
+		}
+		
+		ADDONEARC(g, u-1, v-1, m) ;
+	}
+	
+	if(!PL_get_nil_ex(tail))
+		return FALSE ;
+	
 	return TRUE ;
 }

@@ -49,17 +49,22 @@ typedef int           bool_t ;
  *                 for all (V,U) \in E.
  * **********************************************
  */
-#define PL_GRAPH_FMT_MATRIX          1
-#define PL_GRAPH_FMT_ADJ_LIST        2
-#define PL_GRAPH_FMT_EDGE_LIST       4
-#define PL_GRAPH_FMT_UPPER           8
-#define PL_GRAPH_FMT_FLAT           16
-#define PL_GRAPH_FMT_CHAR2          32
-#define PL_GRAPH_FMT_CHAR16         64
-#define PL_GRAPH_FMT_G6_CODES      128
-#define PL_GRAPH_FMT_G6_CHARS      256
-#define PL_GRAPH_FMT_G6_ATOM       512
-#define PL_GRAPH_FMT_G6_STRING    1024
+#define PL_GRAPH_FMT_MATRIX                1
+#define PL_GRAPH_FMT_ADJ_LIST              2
+#define PL_GRAPH_FMT_EDGE_LIST             4
+#define PL_GRAPH_FMT_UPPER                 8
+#define PL_GRAPH_FMT_FLAT                 16
+#define PL_GRAPH_FMT_CHAR2                32
+#define PL_GRAPH_FMT_CHAR16               64
+#define PL_GRAPH_FMT_G6_CODES            128
+#define PL_GRAPH_FMT_G6_CHARS            256
+#define PL_GRAPH_FMT_G6_ATOM             512
+#define PL_GRAPH_FMT_G6_STRING          1024
+#define PL_GRAPH_FMT_D6_ATOM            2048
+#define PL_GRAPH_FMT_DI_EDGE_LIST       4096
+#define PL_GRAPH_FMT_PERMUTATION_LIST   8192
+#define PL_GRAPH_FMT_PERMUTATION_PAIRS 16384
+
 // #define PL_GRAPH_FMT_DI_ADJ_LIST  2048
 // #define PL_GRAPH_FMT_DI_EDGE_LIST 4096
 

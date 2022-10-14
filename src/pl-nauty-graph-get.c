@@ -40,6 +40,7 @@ pl_get_graph_ex(term_t Graph, int n, int m, flag_t fmt, graph* g)
 		case PL_GRAPH_FMT_DI_EDGE_LIST     : return pl_get_graph_di_edge_list_ex (Graph, n, m, g) ;
 		case PL_GRAPH_FMT_PERMUTATION_LIST : return pl_get_graph_perm_list_ex    (Graph, n, m, g) ;
 		case PL_GRAPH_FMT_PERMUTATION_PAIRS: return pl_get_graph_perm_pairs_ex   (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_SAT_ADJ_MATRIX   : return pl_get_graph_sat_adj_matrix  (Graph, n, m, g) ;
 		
 		default:
 			Fmt = PL_new_term_ref() ;
@@ -648,6 +649,53 @@ pl_get_graph_perm_pairs_ex(term_t Graph, int n, int m, graph *g)
 	}
 	
 	if(!PL_get_nil_ex(tail))
+		return FALSE ;
+	
+	return TRUE ;
+}
+
+/*
+ * **********************************************
+ * PL_GRAPH_FMT_SAT_MATRIX -> graph*
+ * **********************************************
+ */
+int
+pl_get_graph_sat_adj_matrix(term_t Graph, int n, int m, graph *g)
+{
+	int c,i,j ;
+	term_t mat, row, cell ;
+	
+	EMPTYGRAPH(g,m,n) ;
+	
+	row = PL_new_term_ref() ;
+	cell = PL_new_term_ref() ;
+	mat = PL_copy_term_ref(Graph) ;
+	for(i = 0 ; i < n ; i++) {
+		if(!PL_get_list_ex(mat, row, mat))
+			return FALSE ;
+		
+		for(j = 0 ; j < n ; j++) {
+			if(!PL_get_list_ex(row, cell ,row))
+				return FALSE ;
+			
+			if(!PL_get_integer_ex(cell, &c))
+				return FALSE ;
+			
+			// if(i < j && c == 1)
+			// 	ADDONEEDGE(g, i, j, m) ;
+			
+			// 			if(c == 1)
+			// 				ADDONEEDGE(g, i, j, m) ;
+			
+			if(c > 0)
+				ADDONEARC(g, i, j, m) ;
+		}
+		
+		if(!PL_get_nil_ex(row))
+			return FALSE ;
+	}
+	
+	if(!PL_get_nil_ex(mat))
 		return FALSE ;
 	
 	return TRUE ;

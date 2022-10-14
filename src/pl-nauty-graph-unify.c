@@ -40,6 +40,7 @@ pl_unify_graph_ex(term_t Graph, int n, int m, flag_t fmt, graph* g)
 		case PL_GRAPH_FMT_DI_EDGE_LIST     : return pl_unify_graph_di_edge_list_ex (Graph, n, m, g) ;
 		case PL_GRAPH_FMT_PERMUTATION_LIST : return pl_unify_graph_perm_list_ex    (Graph, n, m, g) ;
 		case PL_GRAPH_FMT_PERMUTATION_PAIRS: return pl_unify_graph_perm_pairs_ex   (Graph, n, m, g) ;
+		case PL_GRAPH_FMT_SAT_ADJ_MATRIX   : return pl_unify_graph_sat_adj_matrix  (Graph, n, m, g) ;
 		
 		default:
 			Fmt = PL_new_term_ref() ;
@@ -781,3 +782,55 @@ pl_unify_graph_perm_pairs_ex(term_t Graph, int n, int m, graph *g)
 	return TRUE ;
 }
 
+
+/*
+ * **********************************************
+ * graph* -> PL_GRAPH_FMT_SAT_MATRIX
+ * **********************************************
+ */
+int
+pl_unify_graph_sat_adj_matrix(term_t Graph, int n, int m, graph *g)
+{
+	int i, j, c ;
+	term_t mat, row, cell ;
+	set *gi ;
+	
+	mat = PL_copy_term_ref(Graph) ;
+	row = PL_new_term_ref() ;
+	cell = PL_new_term_ref() ;
+	for(i = 0 ; i < n ; i++) {
+		gi = GRAPHROW(g, i, m) ;
+		
+		row = PL_new_term_ref() ;
+		if(!PL_unify_list(mat, row, mat)) {
+			PL_UNIFIABLE_ERROR("pair", mat) ;
+			return FALSE ;
+		}
+		
+		for(j = 0 ; j < n ; j++) {
+			cell = PL_new_term_ref() ;
+			if(!PL_unify_list(row, cell, row)) {
+				PL_UNIFIABLE_ERROR("pair", row) ;
+				return FALSE ;
+			}
+			
+			c = ISELEMENT(gi, j) ? 1 : -1 ;
+			if(!PL_unify_integer(cell, c)) {
+				PL_UNIFIABLE_ERROR("integer", cell) ;
+				return FALSE ;
+			}
+		}
+		
+		if(!PL_unify_nil(row)) {
+			PL_UNIFIABLE_ERROR("[]", row) ;
+			return FALSE ;
+		}
+	}
+	
+	if(!PL_unify_nil(mat)) {
+		PL_UNIFIABLE_ERROR("[]", mat) ;
+		return FALSE ;
+	}
+	
+	return TRUE ;
+}

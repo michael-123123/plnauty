@@ -199,6 +199,7 @@ extern atom_t d6_atom_a      ;
 extern atom_t di_edge_list_a ;
 extern atom_t perm_list_a    ;
 extern atom_t perm_pairs_a   ;
+extern atom_t sat_adj_mat_a  ;
 
 /*
  * static options struct

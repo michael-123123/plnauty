@@ -7,7 +7,7 @@
 # pl settings
 PLSETTINGS	:= pl.conf
 # nauty settings
-NAUTYBASE   	:= ../nauty26r3
+NAUTYBASE   	:= ../nauty26r12
 # pl version info
 PLVERSION  	:= $(shell swipl --dump-runtime-variables | grep -i PLVERSION | sed s/\"//g |  sed s/\;//g | cut -d= -f2)
 DPLVERSION	:= -DPLVERSION=$(PLVERSION)
@@ -54,25 +54,25 @@ clean-plnauty:
 # 
 
 pl-nauty: pl-nauty-libs pl-nauty-compat pl-densenauty-opts pl-densenauty
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -c pl-nauty.c
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -o pl-nauty.so \
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -c pl-nauty.c
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -o pl-nauty.so \
 		pl-nauty.o pl-nauty-libs.o pl-nauty-compat.o pl-densenauty-opts.o pl-densenauty.o ${NAUTYBASE}/*.a 
 
 pl-nauty-libs:
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -c pl-nauty-graph-get.c
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -c pl-nauty-graph-unify.c
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -c pl-nauty-graph-conv.c
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -c pl-nauty-lists.c
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -c pl-nauty-graph-get.c
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -c pl-nauty-graph-unify.c
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -c pl-nauty-graph-conv.c
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -c pl-nauty-lists.c
 	ld -r -o pl-nauty-libs.o pl-nauty-graph-get.o pl-nauty-graph-unify.o pl-nauty-graph-conv.o pl-nauty-lists.o
 
 pl-nauty-compat:
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -c pl-nauty-compat.c
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -c pl-nauty-compat.c
 
 pl-densenauty-opts:
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -c pl-densenauty-opts.c
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -c pl-densenauty-opts.c
 
 pl-densenauty:
-	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) -fPIC $(PLLDFLAGS) -shared -c pl-densenauty.c
+	$(CC) -O4 -s -I $(PLBASE)/include -I ${NAUTYBASE} $(DPLVERSION) $(DPLNDEBUG) $(PLCFLAGS) $(PLLDFLAGS) -shared -fPIC -c pl-densenauty.c
 
 # 
 # ###############################################

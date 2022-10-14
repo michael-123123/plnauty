@@ -5,7 +5,7 @@
 # 
 
 # nauty settings
-NAUTYBASE   	:= nauty26r3
+NAUTYBASE   	:= nauty26r12
 
 #
 # ###############################################
@@ -58,7 +58,7 @@ nauty: $(NAUTYBASE)
 
 $(NAUTYBASE): clean-$(NAUTYBASE) FORCE
 	(cd nauty ;		\
-	 tar xvf $@.tar.xz ;	\
+	 tar xvzf $@.tar.gz ;	\
 	 mv $@ ..)
 	(cd $@; ./configure CFLAGS=-fPIC; make -j)
 

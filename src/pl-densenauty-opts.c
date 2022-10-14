@@ -56,6 +56,7 @@ atom_t d6_atom_a      = (atom_t) NULL ;
 atom_t di_edge_list_a = (atom_t) NULL ;
 atom_t perm_list_a    = (atom_t) NULL ;
 atom_t perm_pairs_a   = (atom_t) NULL ;
+atom_t sat_adj_mat_a  = (atom_t) NULL ;
 
 /*
  * **********************************************
@@ -113,6 +114,7 @@ pl_densenauty_init()
 	di_edge_list_a = PL_new_atom("directed_edge_list")     ;
 	perm_list_a    = PL_new_atom("permutation_list")       ;
 	perm_pairs_a   = PL_new_atom("permutation_pairs_list") ;
+	sat_adj_mat_a  = PL_new_atom("sat_adj_matrix")         ;
 
 
 	/*
@@ -371,6 +373,7 @@ pl_get_densenauty_fmt_ex(term_t Fmt, flag_t* fmt)
 	else if( name == di_edge_list_a ) *fmt = PL_GRAPH_FMT_DI_EDGE_LIST      ;
 	else if( name == perm_list_a    ) *fmt = PL_GRAPH_FMT_PERMUTATION_LIST  ;
 	else if( name == perm_pairs_a   ) *fmt = PL_GRAPH_FMT_PERMUTATION_PAIRS ;
+	else if( name == sat_adj_mat_a  ) *fmt = PL_GRAPH_FMT_SAT_ADJ_MATRIX    ;
 	else { PL_type_error("legal graph format", Fmt); return FALSE ; }
 	
 	return TRUE ;
